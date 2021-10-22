@@ -12,5 +12,8 @@ src_managed/
 project/boot/
 project/plugins/project/
 
+# Ignore IntelliJ Idea
+.idea
+
 # Don't include VERSION file
 VERSION
