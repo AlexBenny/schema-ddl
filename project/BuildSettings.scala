@@ -28,7 +28,8 @@ object BuildSettings {
     organization       := "com.snowplowanalytics",
     scalaVersion       := "2.12.14",
     crossScalaVersions := Seq("2.12.14", "2.13.6"),
-    licenses += ("Apache-2.0", url("https://www.apache.org/licenses/LICENSE-2.0"))
+    licenses += ("Apache-2.0", url("https://www.apache.org/licenses/LICENSE-2.0")),
+    scalacOptions ~= (_.filterNot(Set("-Xfatal-warnings")))
   )
 
   lazy val basicSettigns = Seq(

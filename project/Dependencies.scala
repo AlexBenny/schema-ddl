@@ -37,6 +37,8 @@ object Dependencies {
     val igluCoreCirce    = "com.snowplowanalytics"      %% "iglu-core-circe"        % V.igluCore
     val circeGeneric     = "io.circe"                   %% "circe-generic"          % V.circe
     val circeJackson     = "io.circe"                   %% "circe-jackson210"       % V.circeJackson
+    val circeLiteral     = "io.circe"                   %% "circe-literal"          % V.circe
+    val circeParser      = "io.circe"                   %% "circe-parser"           % V.circe
     val libCompat        = "org.scala-lang.modules"     %% "scala-collection-compat" % V.libCompat
     val catsParse        = "org.typelevel"              %% "cats-parse"             % V.catsParse
     // Java
@@ -47,7 +49,5 @@ object Dependencies {
     val specs2Cats       = "org.specs2"                 %% "specs2-cats"            % V.specs2     % Test
     val specs2Scalacheck = "org.specs2"                 %% "specs2-scalacheck"      % V.specs2     % Test
     val scalaCheck       = "org.scalacheck"             %% "scalacheck"             % V.scalaCheck % Test
-    val circeLiteral     = "io.circe"                   %% "circe-literal"          % V.circe      % Test
-    val circeParser      = "io.circe"                   %% "circe-parser"           % V.circe      % Test
   }
 }

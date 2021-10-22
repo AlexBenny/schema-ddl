@@ -1,86 +1,76 @@
-import com.snowplowanalytics.iglu.schemaddl.jsonschema.Schema
+import java.io.PrintWriter
 
-import com.snowplowanalytics.iglu.schemaddl.jsonschema.properties.ObjectProperty._
-import com.snowplowanalytics.iglu.schemaddl.jsonschema.properties.NumberProperty._
-import com.snowplowanalytics.iglu.schemaddl.jsonschema.properties.ArrayProperty._
-import com.snowplowanalytics.iglu.schemaddl.jsonschema.properties.StringProperty._
-import com.snowplowanalytics.iglu.schemaddl.jsonschema.properties.CommonProperties._
+import com.snowplowanalytics.iglu.schemaddl.bigquery.Type.Record
+import com.snowplowanalytics.iglu.schemaddl.bigquery.Field
+import com.snowplowanalytics.iglu.schemaddl.jsonschema.Schema
+import io.circe.literal._
+import com.snowplowanalytics.iglu.schemaddl.jsonschema.circe.implicits._
 
 object Main extends App {
 
-  implicit def optconv[A](a: A): Option[A] = Some(a)
+  val className = "ScreenView"
+  val json =
+   json"""
+{
+    "$$schema": "http://iglucentral.com/schemas/com.snowplowanalytics.self-desc/schema/jsonschema/1-0-0#",
+    "description": "Schema for a screen view event",
+    "self": {
+        "vendor": "com.snowplowanalytics.mobile",
+        "name": "screen_view",
+        "format": "jsonschema",
+        "version": "1-0-0"
+    },
+    "type": "object",
+    "properties": {
+        "name": {
+            "type": "string",
+            "description": "The name of the screen viewed."
+        },
+        "type": {
+            "type": "string",
+            "description": "The type of screen that was viewed e.g feed / carousel."
+        },
+        "id": {
+            "type": "string",
+	        "format": "uuid",
+            "maxLength": 36,
+            "description": "An ID from the associated screenview event."
+        },
+        "previousName": {
+            "type": "string",
+            "description": "The name of the previous screen."
+        },
+        "previousId": {
+            "type": "string",
+	        "format": "uuid",
+            "description": "A screenview ID of the previous screenview."
+        },
+        "previousType": {
+            "type": "string",
+            "description": "The screen type of the previous screenview."
+        },
+        "transitionType": {
+            "type": "string",
+            "description": "The type of transition that led to the screen being viewed."
+        }
+    },
+    "minProperties": 2,
+    "required": ["name", "id"],
+    "additionalProperties": false
+}
+      """
 
-  val schema = Schema(
-    `type` = Type.Object,
-    properties = Properties(Map(
-      "ipAddress" -> Schema(
-        `type` = Type.String,
-        format = Format.Ipv4Format
-      ),
-      "email" -> Schema(
-        `type` = Type.String,
-        format = Format.EmailFormat
-      ),
-      "someString" -> Schema(
-        `type` = Type.String
-      ),
-      "netstedObject" -> Schema(
-        `type` = Type.Object,
-        properties = Properties(Map(
-          "nestedKey" -> Schema(
-            `type` = Type.Null
-          ),
-          "deeply" -> Schema(
-            `type` = Type.Object,
-            properties = Properties(Map(
-              "blueDeep" -> Schema(
-                `type` = Type.Integer,
-                minimum =  Minimum.IntegerMinimum(0),
-                maximum = Maximum.IntegerMaximum(32767)
-              ),
-              "deepUnionTypeArray" -> Schema(
-                `type` = Type.Array,
-                items = Items.ListItems(Schema(
-                  `type` = Type.Union(Set(Type.Object, Type.String, Type.Null, Type.Integer)),
-                  properties = Properties(Map(
-                    "foo" -> Schema(
-                      `type` = Type.String
-                    )
-                  )),
-                  additionalProperties = AdditionalProperties.AdditionalPropertiesAllowed(false),
-                  minimum = Minimum.IntegerMinimum(0),
-                  maximum = Maximum.IntegerMaximum(32767)
-                ))
-              )
-            )),
-            additionalProperties = AdditionalProperties.AdditionalPropertiesAllowed(false)
-          )
-        )),
-        additionalProperties = AdditionalProperties.AdditionalPropertiesAllowed(false)
-      ),
-      "emptyObject" -> Schema(
-        `type` = Type.Object,
-        properties = Properties(Map()),
-        additionalProperties = AdditionalProperties.AdditionalPropertiesAllowed(false)
-      ),
-      "simpleArray" -> Schema(
-        `type` = Type.Array,
-        items = Items.ListItems(Schema(
-          `type` = Type.Integer,
-          minimum = Minimum.IntegerMinimum(0),
-          maximum = Maximum.IntegerMaximum(32767)
-        ))
-      )
-    )),
-    additionalProperties = AdditionalProperties.AdditionalPropertiesAllowed(false)
-  )
+  val schema = Schema.parse(json)
+  val field = Field.build(className, schema.getOrElse(Schema.empty), false)
 
-  def generate(schema: String): String = {
-    val content: play.twirl.api.Txt = txt.Example(schema)
-    content.body
+  val fields = field.fieldType match {
+    case Record(fields) => fields
+    case _ => List.empty
   }
+  // println(fields.map(_.name + ": " + _.fieldType) .mkString(","))
 
-  // val schema = TypeSchema.fromJson("sample/src/main/resources/Foo.json")
+  val result = txt.Example(className, "iglu:com.snowplowanalytics.mobile/screen_view/jsonschema/1-0-0", fields)
 
-  println(generate("Hello World"))
+  println(result.body)
+  new PrintWriter(className + ".java") { write(result.body); close() }
 }
