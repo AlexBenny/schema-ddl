@@ -1,10 +1,12 @@
 import java.io.PrintWriter
 
-import com.snowplowanalytics.iglu.schemaddl.bigquery.Type.Record
-import com.snowplowanalytics.iglu.schemaddl.bigquery.Field
 import com.snowplowanalytics.iglu.schemaddl.jsonschema.Schema
 import io.circe.literal._
 import com.snowplowanalytics.iglu.schemaddl.jsonschema.circe.implicits._
+import com.snowplowanalytics.iglu.schemaddl.jsonschema.properties.ObjectProperty
+import com.snowplowanalytics.iglu.schemaddl.trackers.{EnrichedProperty, ObjCProperty}
+
+case class MyProp(name: String, `type`: String, description: String, required: Boolean)
 
 object Main extends App {
 
@@ -37,7 +39,7 @@ object Main extends App {
             "description": "An ID from the associated screenview event."
         },
         "previousName": {
-            "type": "string",
+            "type": ["string", "null"],
             "description": "The name of the previous screen."
         },
         "previousId": {
@@ -55,22 +57,43 @@ object Main extends App {
         }
     },
     "minProperties": 2,
-    "required": ["name", "id"],
+    "required": ["name", "id", "previousName"],
     "additionalProperties": false
 }
       """
 
-  val schema = Schema.parse(json)
+  val schemaUnwrapped = Schema.parse(json)
+  /*
   val field = Field.build(className, schema.getOrElse(Schema.empty), false)
 
   val fields = field.fieldType match {
     case Record(fields) => fields
     case _ => List.empty
   }
-  // println(fields.map(_.name + ": " + _.fieldType) .mkString(","))
-
   val result = txt.Example(className, "iglu:com.snowplowanalytics.mobile/screen_view/jsonschema/1-0-0", fields)
 
-  println(result.body)
+  //println(result.body)
   new PrintWriter(className + ".java") { write(result.body); close() }
+*/
+  // --
+
+  val schema = schemaUnwrapped.getOrElse(Schema.empty)
+  val requiredFields = schema.required match {
+    case Some(value) => Option(value.value)
+    case None => None
+  }
+
+  val properties = schema.properties.getOrElse(ObjectProperty.Properties(Map.empty)).value.toSeq
+  val enrichedProperties = properties.map(item => {
+    EnrichedProperty.build(item._1, item._2, required = requiredFields)
+  })
+
+  println("\n\nEnrichedProperties =\n" + enrichedProperties)
+
+  val objcProperties = enrichedProperties.flatMap(ObjCProperty.build)
+
+  println("\n\nObjCProperties =\n" + objcProperties)
+
+  val result = txt.ObjCHeader("SP" + className.capitalize, className, "iglu:com.snowplowanalytics.mobile/screen_view/jsonschema/1-0-0", objcProperties)
+  new PrintWriter("SP" + className.capitalize + ".h") { write(result.body); close() }
 }

@@ -50,7 +50,7 @@ public class ScreenView extends AbstractSelfDescribing {
     public String type;
     
 
-    public ScreenView(id, name, previousId, previousName, previousType, transitionType, type) {
+    public ScreenView(id: String, name: String, previousId: String, previousName: String, previousType: String, transitionType: String, type: String) {
         
         this.id = id;
         
