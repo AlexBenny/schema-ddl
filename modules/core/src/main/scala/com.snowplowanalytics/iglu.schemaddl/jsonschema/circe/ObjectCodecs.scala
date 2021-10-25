@@ -13,12 +13,12 @@
 package com.snowplowanalytics.iglu.schemaddl.jsonschema
 package circe
 
-import io.circe.{Encoder, Decoder, DecodingFailure}
+import io.circe.{Decoder, DecodingFailure, Encoder}
 import io.circe.syntax._
-
 import cats.implicits._
-
 import com.snowplowanalytics.iglu.schemaddl.jsonschema.properties.ObjectProperty._
+
+import scala.collection.immutable.ListMap
 
 trait ObjectCodecs {
   private val PropertiesExpectation = "properties expected to be a map of JSON schemas"
@@ -37,7 +37,7 @@ trait ObjectCodecs {
       obj =>
         obj.toList
           .traverse[Decoder.Result, (String, Schema)] { case (property, schema) => schema.as[Schema].map((property, _)) }
-          .map(m => Properties.apply(m.toMap))
+          .map(m => Properties.apply(ListMap(m: _*)))
     )
   }
 

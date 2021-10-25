@@ -28,46 +28,46 @@ NS_ASSUME_NONNULL_BEGIN
 @interface SPScreenView : SPSelfDescribingAbstract
 extern NSString * const kSPScreenViewSchema;
 
-extern NSString * const kSPScreenViewParamPreviousType;
-
 extern NSString * const kSPScreenViewParamName;
-
-extern NSString * const kSPScreenViewParamPreviousName;
-
-extern NSString * const kSPScreenViewParamTransitionType;
-
-extern NSString * const kSPScreenViewParamId;
 
 extern NSString * const kSPScreenViewParamType;
 
+extern NSString * const kSPScreenViewParamId;
+
+extern NSString * const kSPScreenViewParamPreviousName;
+
 extern NSString * const kSPScreenViewParamPreviousId;
 
+extern NSString * const kSPScreenViewParamPreviousType;
+
+extern NSString * const kSPScreenViewParamTransitionType;
 
 
-/// The screen type of the previous screenview.
-@property (nonatomic, nonnull, readonly) NSString *previousType;
 
 /// The name of the screen viewed.
 @property (nonatomic, nonnull, readonly) NSString *name;
 
-/// The name of the previous screen.
-@property (nonatomic, nullable) NSString *previousName;
-
-/// The type of transition that led to the screen being viewed.
-@property (nonatomic, nonnull, readonly) NSString *transitionType;
+/// The type of screen that was viewed e.g feed / carousel.
+@property (nonatomic, nonnull, readonly) NSString *type;
 
 /// An ID from the associated screenview event.
 @property (nonatomic, nonnull, readonly) NSString *id;
 
-/// The type of screen that was viewed e.g feed / carousel.
-@property (nonatomic, nonnull, readonly) NSString *type;
+/// The name of the previous screen.
+@property (nonatomic, nullable) NSString *previousName;
 
 /// A screenview ID of the previous screenview.
 @property (nonatomic, nonnull, readonly) NSString *previousId;
 
+/// The screen type of the previous screenview.
+@property (nonatomic, nonnull, readonly) NSString *previousType;
+
+/// The type of transition that led to the screen being viewed.
+@property (nonatomic, nonnull, readonly) NSString *transitionType;
+
 
 - (instancetype)init NS_UNAVAILABLE;
-- (instancetype)initWithPreviousType:(NSString *)previousType Name:(NSString *)name TransitionType:(NSString *)transitionType Id:(NSString *)id Type:(NSString *)type PreviousId:(NSString *)previousId ;
+- (instancetype)initWithName:(NSString *)name Type:(NSString *)type Id:(NSString *)id PreviousId:(NSString *)previousId PreviousType:(NSString *)previousType TransitionType:(NSString *)transitionType ;
 
 
 SP_BUILDER_DECLARE_NULLABLE(NSString *, previousName)

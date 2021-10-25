@@ -78,6 +78,8 @@ object Main extends App {
   // --
 
   val schema = schemaUnwrapped.getOrElse(Schema.empty)
+  println("\n\nSchema =\n" + schema)
+
   val requiredFields = schema.required match {
     case Some(value) => Option(value.value)
     case None => None
